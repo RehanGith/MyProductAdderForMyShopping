@@ -9,17 +9,24 @@ import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.myproductadder.databinding.ActivityMainBinding
+import com.google.firebase.Firebase
+import com.google.firebase.storage.storage
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private  var selectedImages = mutableListOf<Uri>()
     private var selectedColors = mutableListOf<Int>()
+    private var productStorage = Firebase.storage.reference
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -109,6 +116,42 @@ class MainActivity : AppCompatActivity() {
         val offerPercent = binding.offerPercentage.text.toString().trim()
         val selectedSizes = getSizeList(binding.edSizes.text.toString().trim())
         val imagesByteArray = getImagesByteArray()
+        val images = mutableListOf<String>()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                async {
+                    imagesByteArray.forEach {
+                    val id = UUID.randomUUID().toString()
+                    launch {
+                        val imageStorage = productStorage.child("products/images/$id")
+                        val result = imageStorage.putBytes(it).await()
+                        val downloadUrl = result.storage.downloadUrl.await().toString()
+                        images.add(downloadUrl)
+                    }
+                    }
+                }.await()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                hideProgressBar()
+            }
+            val product = Product(
+                id = UUID.randomUUID().toString(),
+                name = name,
+                category = category,
+                price = price.toFloat(),
+                offerPercentage = if(offerPercent.isEmpty()) null else offerPercent.toFloat().toString(),
+                description = if (description.isEmpty()) null else description,
+                colors = if (selectedColors.isEmpty()) null else selectedColors,
+                sizes = selectedSizes,
+                images = images
+            )
+        }
+    }
+
+    private fun hideProgressBar() {
+        TODO("Not yet implemented")
     }
 
     private fun getImagesByteArray(): List<ByteArray> {
