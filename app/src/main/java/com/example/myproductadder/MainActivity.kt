@@ -56,13 +56,19 @@ class MainActivity : AppCompatActivity() {
                     selectedImages.add(it)
                 }
             }
+            updateImages()
         }
         //launching an intent to get images
         binding.buttonImagesPicker.setOnClickListener {
             val intent = Intent(ACTION_GET_CONTENT)
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
             intent.type = "image/*"
+            activityResult.launch(intent.toString())
         }
+    }
+
+    private fun updateImages() {
+        binding.tvSelectedImages.text = selectedImages.size.toString()
     }
 
     private fun updateColors() {
@@ -102,8 +108,20 @@ class MainActivity : AppCompatActivity() {
         val description = binding.edDescription.text.toString().trim()
         val offerPercent = binding.offerPercentage.text.toString().trim()
         val selectedSizes = getSizeList(binding.edSizes.text.toString().trim())
-
+        val imagesByteArray = getImagesByteArray()
     }
+
+    private fun getImagesByteArray(): List<ByteArray> {
+        val imagesByteArray = mutableListOf<ByteArray>()
+        selectedImages.forEach {
+            val bytes = contentResolver.openInputStream(it)?.readBytes()
+            bytes?.let {
+                imagesByteArray.add(it)
+            }
+        }
+        return imagesByteArray
+    }
+
     private fun validateProduct(): Boolean {
         if(binding.edName.text.toString().trim().isEmpty()){
             return false
