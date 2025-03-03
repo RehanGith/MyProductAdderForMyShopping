@@ -1,10 +1,13 @@
 package com.example.myproductadder
 
+import android.content.Intent
+import android.content.Intent.ACTION_GET_CONTENT
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -37,7 +40,28 @@ class MainActivity : AppCompatActivity() {
                 .setNegativeButton("cancel") { colorPicker, _ ->
                     colorPicker.dismiss()
                 }.show()
-
+        }
+        val activityResult = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) {result ->
+            if(intent?.clipData  != null) {
+                val count = intent?.clipData?.itemCount ?: 0
+                (0 until count).forEach {
+                    val imageUri = intent?.clipData?.getItemAt(it)?.uri
+                    imageUri?.let {
+                        selectedImages.add(it)
+                    }
+                }
+            } else {
+                val imageUri = intent?.data
+                imageUri?.let {
+                    selectedImages.add(it)
+                }
+            }
+        }
+        //launching an intent to get images
+        binding.buttonImagesPicker.setOnClickListener {
+            val intent = Intent(ACTION_GET_CONTENT)
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            intent.type = "image/*"
         }
     }
 
