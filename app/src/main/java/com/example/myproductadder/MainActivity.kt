@@ -1,5 +1,6 @@
 package com.example.myproductadder
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -11,6 +12,7 @@ import com.example.myproductadder.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private  var selectedImages = mutableListOf<Uri>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -25,6 +27,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId == R.id.saveProduct) {
+            if(validateProduct())  {
+
+            }
+        }
         return super.onOptionsItemSelected(item)
+    }
+
+
+    private fun validateProduct(): Boolean {
+        if(binding.edName.text.toString().trim().isEmpty()){
+            return false
+        }
+        if(binding.edPrice.text.toString().trim().isEmpty()){
+            return false
+        }
+        if(binding.edCategory.text.toString().trim().isEmpty()){
+            return false
+        }
+        if(selectedImages.isEmpty()){
+            return false
+        }
+        return true
     }
 }
