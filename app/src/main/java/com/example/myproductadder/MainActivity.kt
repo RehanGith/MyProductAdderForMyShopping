@@ -4,14 +4,17 @@ import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.myproductadder.databinding.ActivityMainBinding
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerDialog
@@ -26,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private  var selectedImages = mutableListOf<Uri>()
     private var selectedColors = mutableListOf<Int>()
+    val firestore = Firebase.firestore
     private var productStorage = Firebase.storage.reference
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,7 +98,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if(item.itemId == R.id.saveProduct) {
             if(validateProduct())  {
-
+                saveProduct()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -119,6 +123,7 @@ class MainActivity : AppCompatActivity() {
         val images = mutableListOf<String>()
 
         lifecycleScope.launch(Dispatchers.IO) {
+            showProgressBar()
             try {
                 async {
                     imagesByteArray.forEach {
@@ -147,11 +152,22 @@ class MainActivity : AppCompatActivity() {
                 sizes = selectedSizes,
                 images = images
             )
+            firestore.collection("Product").add(product).addOnSuccessListener {
+                hideProgressBar()
+                finish()
+            }.addOnFailureListener {
+                hideProgressBar()
+                Log.e("Error", it.message.toString())
+            }
         }
     }
 
+    private fun showProgressBar() {
+        binding.progressCircular.visibility = View.VISIBLE
+    }
+
     private fun hideProgressBar() {
-        TODO("Not yet implemented")
+        binding.progressCircular.visibility = View.GONE
     }
 
     private fun getImagesByteArray(): List<ByteArray> {
