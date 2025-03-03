@@ -13,12 +13,15 @@ import com.example.myproductadder.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private  var selectedImages = mutableListOf<Uri>()
+    private var selectedColors = mutableListOf<Int>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.buttonColorPicker.setOnClickListener {
 
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -35,7 +38,23 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun getSizeList(size: String): List<String>? {
+        if(size.isEmpty()) {
+            return null
+        }
+        val sizeList = size.split(",").toMutableList()
+        return sizeList
+    }
 
+    private fun saveProduct() {
+        val name = binding.edName.text.toString().trim()
+        val price = binding.edPrice.text.toString().trim()
+        val category = binding.edCategory.text.toString().trim()
+        val description = binding.edDescription.text.toString().trim()
+        val offerPercent = binding.offerPercentage.text.toString().trim()
+        val selectedSizes = getSizeList(binding.edSizes.text.toString().trim())
+
+    }
     private fun validateProduct(): Boolean {
         if(binding.edName.text.toString().trim().isEmpty()){
             return false
