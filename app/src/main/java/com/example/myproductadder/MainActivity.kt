@@ -9,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.myproductadder.databinding.ActivityMainBinding
+import com.skydoves.colorpickerview.ColorEnvelope
+import com.skydoves.colorpickerview.ColorPickerDialog
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -20,8 +23,30 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.buttonColorPicker.setOnClickListener {
+            ColorPickerDialog.Builder(this)
+                .setTitle("Product Color")
+                .setPositiveButton("Select", object : ColorEnvelopeListener {
+                    override fun onColorSelected(p0: ColorEnvelope?, p1: Boolean) {
+                        p0?.let {
+                            selectedColors.add(it.color)
+                            updateColors()
+                        }
+                    }
+
+                })
+                .setNegativeButton("cancel") { colorPicker, _ ->
+                    colorPicker.dismiss()
+                }.show()
 
         }
+    }
+
+    private fun updateColors() {
+        var colors = ""
+        selectedColors.forEach {
+            colors = "$colors ${Integer.toHexString(it)}"
+        }
+        binding.tvSelectedColors.text = colors
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -13,7 +13,7 @@ lifecyle = "2.8.7"
 googleGmsGoogleServices = "4.4.2"
 firebaseFirestore = "25.1.2"
 firebaseStorage = "21.0.1"
-
+color = "2.2.4"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -26,7 +26,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-lifecycel-runtime = {group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecyle"}
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
-
+github-colorPicker = {group = "com.github.skydoves", name = "colorpickerview", version.ref = "color"}
 
 
 [plugins]
